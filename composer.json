@@ -1,0 +1,21 @@
+{
+  "name": "elipettingale/laravel-progress-command",
+  "description": "A simple command which outputs progress to the console.",
+  "type": "library",
+  "require": {
+    "laravel/framework": "^5.4|^5.5",
+    "php": "^7.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "EliPett\\ProgressCommand\\": "src/"
+    }
+  },
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Elliot Pettingale",
+      "email": "elipettingale@gmail.com"
+    }
+  ]
+}
