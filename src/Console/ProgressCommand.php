@@ -3,8 +3,8 @@
 namespace EliPett\ProgressCommand\Console;
 
 use Illuminate\Console\Command;
-use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Helper\ProgressBar;
+use EliPett\ProgressCommand\Services\ProgressBarFactory;
 
 abstract class ProgressCommand extends Command
 {
@@ -45,34 +45,11 @@ abstract class ProgressCommand extends Command
 
     private function initialiseProgressBars()
     {
-        $this->setOutputStyles();
-        $this->setProgressBars();
-        $this->startProgressBars();
-    }
+        $count = \count($this->items);
 
-    private function setOutputStyles()
-    {
-        $formatter = $this->output->getFormatter();
+        $this->passedBar = ProgressBarFactory::getPassedProgressBar($this->output, $count);
+        $this->failedBar = ProgressBarFactory::getFailedProgressBar($this->output, $count);
 
-        $formatter->setStyle('passed', new OutputFormatterStyle('green'));
-        ProgressBar::setFormatDefinition('passed', '<passed>%current%/%max% [%bar%] %percent:3s%% passed</passed>');
-
-        $formatter->setStyle('failed', new OutputFormatterStyle('red'));
-        ProgressBar::setFormatDefinition('failed', '<failed>%current%/%max% [%bar%] %percent:3s%% failed</failed>');
-    }
-
-    private function setProgressBars()
-    {
-        $this->passedBar = new ProgressBar($this->output, \count($this->items));
-        $this->passedBar->setFormat('passed');
-
-        $this->failedBar = new ProgressBar($this->output, \count($this->items));
-        $this->failedBar->setFormat('failed');
-        $this->failedBar->setProgressCharacter('#');
-    }
-
-    private function startProgressBars()
-    {
         $this->passedBar->start();
         print "\n";
         $this->failedBar->start();
