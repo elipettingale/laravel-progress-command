@@ -8,9 +8,6 @@ use Symfony\Component\Console\Helper\ProgressBar;
 
 abstract class ProgressCommand extends Command
 {
-    protected $name = 'core:progress-command';
-    protected $description = 'Test progress command';
-
     private $items;
 
     /** @var ProgressBar */
