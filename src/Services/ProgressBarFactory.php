@@ -2,32 +2,25 @@
 
 namespace EliPett\ProgressCommand\Services;
 
+use EliPett\ProgressCommand\Structs\ProgressBarBlueprint;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class ProgressBarFactory
 {
-    public static function getPassedProgressBar(OutputInterface $output, int $count)
+    public static function fromBlueprint(ProgressBarBlueprint $blueprint, OutputInterface $output, int $count)
     {
-        $output->getFormatter()->setStyle('passed', new OutputFormatterStyle('green'));
-        ProgressBar::setFormatDefinition('passed', '<passed>%current%/%max% [%bar%] %percent:3s%% passed</passed>');
+        $key = $blueprint->getKey();
 
-        $passedBar = new ProgressBar($output, $count);
-        $passedBar->setFormat('passed');
+        $style = new OutputFormatterStyle($blueprint->getForeground(), $blueprint->getBackground());
+        $output->getFormatter()->setStyle($key, $style);
+        ProgressBar::setFormatDefinition($key, "<$key>%current%/%max% [%bar%] %percent:3s%% {$blueprint->getName()}</$key>");
 
-        return $passedBar;
-    }
+        $progressBar = new ProgressBar($output, $count);
+        $progressBar->setFormat($key);
+        $progressBar->setProgressCharacter($blueprint->getProgressCharacter());
 
-    public static function getFailedProgressBar(OutputInterface $output, int $count)
-    {
-        $output->getFormatter()->setStyle('failed', new OutputFormatterStyle('red'));
-        ProgressBar::setFormatDefinition('failed', '<failed>%current%/%max% [%bar%] %percent:3s%% failed</failed>');
-
-        $failedBar = new ProgressBar($output, $count);
-        $failedBar->setFormat('failed');
-        $failedBar->setProgressCharacter('#');
-
-        return $failedBar;
+        return $progressBar;
     }
 }

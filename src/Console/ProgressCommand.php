@@ -2,6 +2,7 @@
 
 namespace EliPett\ProgressCommand\Console;
 
+use EliPett\ProgressCommand\Structs\ProgressBarBlueprint;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use EliPett\ProgressCommand\Services\ProgressBarFactory;
@@ -47,8 +48,8 @@ abstract class ProgressCommand extends Command
     {
         $count = \count($this->items);
 
-        $this->passedBar = ProgressBarFactory::getPassedProgressBar($this->output, $count);
-        $this->failedBar = ProgressBarFactory::getFailedProgressBar($this->output, $count);
+        $this->passedBar = ProgressBarFactory::fromBlueprint(new ProgressBarBlueprint('passed', []), $this->output, $count);
+        $this->failedBar = ProgressBarFactory::fromBlueprint(new ProgressBarBlueprint('failed', []), $this->output, $count);
 
         $this->passedBar->start();
         $this->moveCursorDown();
