@@ -3,20 +3,16 @@
 namespace EliPett\ProgressCommand\Console;
 
 use Illuminate\Console\Command;
-use Symfony\Component\Console\Formatter\OutputFormatterStyle;
-use Symfony\Component\Console\Helper\ProgressBar;
+use EliPett\ProgressCommand\Services\ProgressBarFactory;
 
 abstract class ProgressCommand extends Command
 {
     private $items;
-
-    /** @var ProgressBar */
-    private $passedBar;
-    /** @var ProgressBar */
-    private $failedBar;
+    private $progressBars;
 
     abstract protected function getItems();
     abstract protected function fireItem($item): bool;
+    abstract protected function getProgressBarBlueprints(): array;
 
     public function handle()
     {
@@ -25,56 +21,44 @@ abstract class ProgressCommand extends Command
         $this->initialiseProgressBars();
 
         foreach ($this->items as $item) {
-            $this->output->write("\033[1A");
+            $this->moveCursorUp();
 
             $result = $this->fireItem($item);
 
-            if ($result === true) {
-                $this->passedBar->advance();
-            }
-
-            print "\n";
-
-            if ($result === false) {
-                $this->failedBar->advance();
+            foreach ($this->progressBars as $key => $progressBar) {
+                if ($result === $key) {
+                    $progressBar->advance();
+                }
+                $this->moveCursorDown();
             }
         }
 
-        print "\n";
+        $this->moveCursorDown();
     }
 
     private function initialiseProgressBars()
     {
-        $this->setOutputStyles();
-        $this->setProgressBars();
-        $this->startProgressBars();
+        $count = \count($this->items);
+
+        foreach ($this->getProgressBarBlueprints() as $blueprint) {
+            $this->progressBars[$blueprint->getKey()] = ProgressBarFactory::fromBlueprint($blueprint, $this->output, $count);
+        }
+
+        foreach ($this->progressBars as $progressBar) {
+            $progressBar->start();
+            $this->moveCursorDown();
+        }
+
+        $this->moveCursorUp();
     }
 
-    private function setOutputStyles()
+    private function moveCursorUp()
     {
-        $formatter = $this->output->getFormatter();
-
-        $formatter->setStyle('passed', new OutputFormatterStyle('green'));
-        ProgressBar::setFormatDefinition('passed', '<passed>%current%/%max% [%bar%] %percent:3s%% passed</passed>');
-
-        $formatter->setStyle('failed', new OutputFormatterStyle('red'));
-        ProgressBar::setFormatDefinition('failed', '<failed>%current%/%max% [%bar%] %percent:3s%% failed</failed>');
+        $this->output->write("\033[1A");
     }
 
-    private function setProgressBars()
+    private function moveCursorDown()
     {
-        $this->passedBar = new ProgressBar($this->output, \count($this->items));
-        $this->passedBar->setFormat('passed');
-
-        $this->failedBar = new ProgressBar($this->output, \count($this->items));
-        $this->failedBar->setFormat('failed');
-        $this->failedBar->setProgressCharacter('#');
-    }
-
-    private function startProgressBars()
-    {
-        $this->passedBar->start();
         print "\n";
-        $this->failedBar->start();
     }
 }
