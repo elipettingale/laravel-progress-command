@@ -2,22 +2,17 @@
 
 namespace EliPett\ProgressCommand\Console;
 
-use EliPett\ProgressCommand\Structs\ProgressBarBlueprint;
 use Illuminate\Console\Command;
-use Symfony\Component\Console\Helper\ProgressBar;
 use EliPett\ProgressCommand\Services\ProgressBarFactory;
 
 abstract class ProgressCommand extends Command
 {
     private $items;
-
-    /** @var ProgressBar */
-    private $passedBar;
-    /** @var ProgressBar */
-    private $failedBar;
+    private $progressBars;
 
     abstract protected function getItems();
     abstract protected function fireItem($item): bool;
+    abstract protected function getProgressBarBlueprints(): array;
 
     public function handle()
     {
@@ -30,14 +25,11 @@ abstract class ProgressCommand extends Command
 
             $result = $this->fireItem($item);
 
-            if ($result === true) {
-                $this->passedBar->advance();
-            }
-
-            $this->moveCursorDown();
-
-            if ($result === false) {
-                $this->failedBar->advance();
+            foreach ($this->progressBars as $key => $progressBar) {
+                if ($result === $key) {
+                    $progressBar->advance();
+                }
+                $this->moveCursorDown();
             }
         }
 
@@ -48,12 +40,16 @@ abstract class ProgressCommand extends Command
     {
         $count = \count($this->items);
 
-        $this->passedBar = ProgressBarFactory::fromBlueprint(new ProgressBarBlueprint('passed', []), $this->output, $count);
-        $this->failedBar = ProgressBarFactory::fromBlueprint(new ProgressBarBlueprint('failed', []), $this->output, $count);
+        foreach ($this->getProgressBarBlueprints() as $blueprint) {
+            $this->progressBars[$blueprint->getKey()] = ProgressBarFactory::fromBlueprint($blueprint, $this->output, $count);
+        }
 
-        $this->passedBar->start();
-        $this->moveCursorDown();
-        $this->failedBar->start();
+        foreach ($this->progressBars as $progressBar) {
+            $progressBar->start();
+            $this->moveCursorDown();
+        }
+
+        $this->moveCursorUp();
     }
 
     private function moveCursorUp()
