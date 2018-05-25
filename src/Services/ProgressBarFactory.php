@@ -15,7 +15,7 @@ class ProgressBarFactory
 
         $style = new OutputFormatterStyle($blueprint->getForeground(), $blueprint->getBackground());
         $output->getFormatter()->setStyle($key, $style);
-        ProgressBar::setFormatDefinition($key, "<$key>%current%/%max% [%bar%] %percent:3s%% {$blueprint->getName()}</$key>");
+        ProgressBar::setFormatDefinition($key, "<$key>%current%/%max% [%bar%] %percent:3s%% {$blueprint->getDescription()}</$key>");
 
         $progressBar = new ProgressBar($output, $count);
         $progressBar->setFormat($key);
