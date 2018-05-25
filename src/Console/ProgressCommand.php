@@ -32,8 +32,6 @@ abstract class ProgressCommand extends Command
                 $this->moveCursorDown();
             }
         }
-
-        $this->moveCursorDown();
     }
 
     private function initialiseProgressBars()
