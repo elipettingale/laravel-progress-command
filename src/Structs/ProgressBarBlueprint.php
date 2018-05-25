@@ -16,8 +16,8 @@ class ProgressBarBlueprint
         $this->key = $key;
         $this->description = $description;
 
-        $this->foreground = array_get($data, 'default');
-        $this->background = array_get($data, 'default');
+        $this->foreground = array_get($data, 'foreground');
+        $this->background = array_get($data, 'background');
         $this->progressCharacter = array_get($data, 'progress-character');
     }
 
@@ -38,7 +38,7 @@ class ProgressBarBlueprint
 
     public function getBackground(): string
     {
-        return $this->background ?? 'black';
+        return $this->background ?? 'default';
     }
 
     public function getProgressCharacter(): string
