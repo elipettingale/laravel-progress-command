@@ -11,7 +11,7 @@ abstract class ProgressCommand extends Command
     private $progressBars;
 
     abstract protected function getItems();
-    abstract protected function fireItem($item): bool;
+    abstract protected function fireItem($item): string;
     abstract protected function getProgressBarBlueprints(): array;
 
     public function handle()
