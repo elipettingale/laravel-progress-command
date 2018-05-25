@@ -50,13 +50,17 @@ abstract class ProgressCommand extends Command
         $this->moveCursorUp();
     }
 
-    private function moveCursorUp()
+    private function moveCursorUp(int $lines = 1)
     {
-        $this->output->write("\033[1A");
+        for ($i = 0; $i < $lines; ++$i) {
+            $this->output->write("\033[1A");
+        }
     }
 
-    private function moveCursorDown()
+    private function moveCursorDown(int $lines = 1)
     {
-        print "\n";
+        for ($i = 0; $i < $lines; ++$i) {
+            print "\n";
+        }
     }
 }
