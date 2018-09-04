@@ -11,6 +11,7 @@ abstract class ProgressCommand extends Command
     private $progressBars;
 
     abstract protected function getItems();
+    abstract protected function getItemIdentifier($item): string;
     abstract protected function fireItem($item): string;
     abstract protected function getProgressBarBlueprints(): array;
 
@@ -22,6 +23,7 @@ abstract class ProgressCommand extends Command
 
         foreach ($this->items as $item) {
             $this->moveCursorToTop();
+            $this->renderInfoBar($item);
 
             $result = $this->fireItem($item);
 
@@ -34,7 +36,10 @@ abstract class ProgressCommand extends Command
         }
 
         $end_time = microtime(true);
-        $this->info('Elapsed Time: ' . $end_time - $start_time);
+
+        if (config('progresscommand.display-elapsed-time', false)) {
+            $this->info('Elapsed Time: ' . $end_time - $start_time);
+        }
     }
 
     private function initialiseProgressBars()
@@ -51,9 +56,14 @@ abstract class ProgressCommand extends Command
         }
     }
 
+    private function renderInfoBar($item)
+    {
+        $this->info('Current Item: ' . $this->getItemIdentifier($item));
+    }
+
     private function moveCursorToTop()
     {
-        $this->moveCursorUp(\count($this->progressBars));
+        $this->moveCursorUp(\count($this->progressBars) + 1);
     }
 
     private function moveCursorUp(int $lines = 1)
