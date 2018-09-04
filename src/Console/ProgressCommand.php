@@ -21,7 +21,7 @@ abstract class ProgressCommand extends Command
         $this->initialiseProgressBars();
 
         foreach ($this->items as $item) {
-            $this->moveCursorUp(\count($this->progressBars));
+            $this->moveCursorToTop();
 
             $result = $this->fireItem($item);
 
@@ -46,6 +46,11 @@ abstract class ProgressCommand extends Command
             $progressBar->start();
             $this->moveCursorDown();
         }
+    }
+
+    private function moveCursorToTop()
+    {
+        $this->moveCursorUp(\count($this->progressBars));
     }
 
     private function moveCursorUp(int $lines = 1)
