@@ -17,5 +17,12 @@
       "name": "Elliot Pettingale",
       "email": "elipettingale@gmail.com"
     }
-  ]
+  ],
+  "extra": {
+    "laravel": {
+      "providers": [
+        "EliPett\\ProgressCommand\\ProgressCommandServiceProvider"
+      ]
+    }
+  }
 }
