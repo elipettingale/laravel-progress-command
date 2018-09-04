@@ -17,8 +17,8 @@ abstract class ProgressCommand extends Command
     public function handle()
     {
         $this->items = $this->getItems();
-
         $this->initialiseProgressBars();
+        $start_time = microtime(true);
 
         foreach ($this->items as $item) {
             $this->moveCursorToTop();
@@ -32,6 +32,9 @@ abstract class ProgressCommand extends Command
                 $this->moveCursorDown();
             }
         }
+
+        $end_time = microtime(true);
+        $this->info('Elapsed Time: ' . $end_time - $start_time);
     }
 
     private function initialiseProgressBars()
