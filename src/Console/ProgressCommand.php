@@ -17,7 +17,13 @@ abstract class ProgressCommand extends Command
     public function handle()
     {
         $this->items = $this->getItems();
+
+        if ($this->hasInfoBar()) {
+            $this->moveCursorDown();
+        }
+
         $this->initialiseProgressBars();
+
         $start_time = microtime(true);
 
         foreach ($this->items as $item) {
@@ -55,6 +61,7 @@ abstract class ProgressCommand extends Command
     private function renderInfoBar($item)
     {
         if ($this->hasInfoBar()) {
+            $this->cleanLine();
             $this->info('Current Item: ' . $this->getItemIdentifier($item));
         }
     }
@@ -82,6 +89,18 @@ abstract class ProgressCommand extends Command
         for ($i = 0; $i < $lines; ++$i) {
             print "\n";
         }
+    }
+
+    private function cleanLine(int $chars = 100)
+    {
+        $string = '';
+
+        for ($i = 0; $i <= $chars; ++$i) {
+            $string .= ' ';
+        }
+
+        $this->info($string);
+        $this->moveCursorUp();
     }
 
     private function hasInfoBar(): bool
