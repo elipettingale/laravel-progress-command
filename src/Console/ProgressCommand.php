@@ -22,6 +22,7 @@ abstract class ProgressCommand extends Command
 
         foreach ($this->items as $item) {
             $this->moveCursorToTop();
+            $this->renderInfoBar($item);
 
             $result = $this->fireItem($item);
 
@@ -34,7 +35,10 @@ abstract class ProgressCommand extends Command
         }
 
         $end_time = microtime(true);
-        $this->info('Elapsed Time: ' . $end_time - $start_time);
+
+        if ($this->hasElapsedTimeFormat()) {
+            $this->renderElapsedTimeFormat($start_time, $end_time);
+        }
     }
 
     private function initialiseProgressBars()
@@ -51,9 +55,22 @@ abstract class ProgressCommand extends Command
         }
     }
 
+    private function renderInfoBar($item)
+    {
+        if ($this->hasInfoBar()) {
+            $this->info('Current Item: ' . $this->getItemIdentifier($item));
+        }
+    }
+
     private function moveCursorToTop()
     {
-        $this->moveCursorUp(\count($this->progressBars));
+        $count = \count($this->progressBars);
+
+        if ($this->hasInfoBar()) {
+            $count++;
+        }
+
+        $this->moveCursorUp($count);
     }
 
     private function moveCursorUp(int $lines = 1)
@@ -67,6 +84,25 @@ abstract class ProgressCommand extends Command
     {
         for ($i = 0; $i < $lines; ++$i) {
             print "\n";
+        }
+    }
+
+    private function hasInfoBar(): bool
+    {
+        return method_exists($this, 'getItemIdentifier');
+    }
+
+    private function hasElapsedTimeFormat(): bool
+    {
+        return property_exists($this, 'elapsedTimeFormat');
+    }
+
+    private function renderElapsedTimeFormat($start_time, $end_time)
+    {
+        $time_diff =  $end_time - $start_time;
+
+        if ($this->elapsedTimeFormat === 'miliseconds') {
+            $this->info('Elapsed Time: ' . $time_diff * 1000);
         }
     }
 }
