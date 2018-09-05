@@ -36,8 +36,8 @@ abstract class ProgressCommand extends Command
 
         $end_time = microtime(true);
 
-        if (config('progresscommand.display-elapsed-time', false)) {
-            $this->info('Elapsed Time: ' . $end_time - $start_time);
+        if ($this->hasElapsedTimeFormat()) {
+            $this->renderElapsedTimeFormat($start_time, $end_time);
         }
     }
 
@@ -90,5 +90,19 @@ abstract class ProgressCommand extends Command
     private function hasInfoBar(): bool
     {
         return method_exists($this, 'getItemIdentifier');
+    }
+
+    private function hasElapsedTimeFormat(): bool
+    {
+        return property_exists($this, 'elapsedTimeFormat');
+    }
+
+    private function renderElapsedTimeFormat($start_time, $end_time)
+    {
+        $time_diff =  $end_time - $start_time;
+
+        if ($this->elapsedTimeFormat === 'miliseconds') {
+            $this->info('Elapsed Time: ' . $time_diff * 1000);
+        }
     }
 }
