@@ -1,6 +1,6 @@
 {
   "name": "elipettingale/laravel-progress-command",
-  "description": "A simple command which outputs progress to the console.",
+  "description": "A simple command which outputs progress bars to the console.",
   "type": "library",
   "require": {
     "laravel/framework": "^5.4|^5.5|^5.6",
