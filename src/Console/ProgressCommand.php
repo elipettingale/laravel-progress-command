@@ -2,7 +2,6 @@
 
 namespace EliPett\ProgressCommand\Console;
 
-use EliPett\ProgressCommand\Enums\ElapsedTimeFormats;
 use Illuminate\Console\Command;
 use EliPett\ProgressCommand\Services\ProgressBarFactory;
 
@@ -36,10 +35,7 @@ abstract class ProgressCommand extends Command
         }
 
         $end_time = microtime(true);
-
-        if ($this->hasElapsedTimeFormat()) {
-            $this->renderElapsedTimeFormat($start_time, $end_time);
-        }
+        $this->renderElapsedTimeFormat($start_time, $end_time);
     }
 
     private function initialiseProgressBars()
@@ -93,21 +89,36 @@ abstract class ProgressCommand extends Command
         return method_exists($this, 'getItemIdentifier');
     }
 
-    private function hasElapsedTimeFormat(): bool
-    {
-        return property_exists($this, 'elapsedTimeFormat');
-    }
-
     private function renderElapsedTimeFormat($start_time, $end_time)
     {
-        $time_diff =  $end_time - $start_time;
+        $hours = (int)
+            ($minutes = (int)
+                ($seconds = (int)
+                    ($milliseconds = (int)
+                    (($end_time - $start_time) * 1000))
+                    / 1000)
+                / 60)
+            / 60;
 
-        if ($this->elapsedTimeFormat === ElapsedTimeFormats::MILLISECONDS) {
-            $this->info('Elapsed Time: ' . $time_diff * 1000);
+        $minutes = $minutes % 60;
+        $seconds = $seconds % 60;
+        $milliseconds = $milliseconds % 1000;
+
+        if ($hours !== 0) {
+            $this->info("Elapsed Time: {$hours} hours {$minutes} minutes {$seconds} seconds {$milliseconds} milliseconds");
+            return;
         }
 
-        if ($this->elapsedTimeFormat === ElapsedTimeFormats::SECONDS) {
-            $this->info('Elapsed Time: ' . date('s', $time_diff));
+        if ($minutes !== 0) {
+            $this->info("Elapsed Time: {$minutes} minutes {$seconds} seconds {$milliseconds} milliseconds");
+            return;
         }
+
+        if ($seconds !== 0) {
+            $this->info("Elapsed Time: {$seconds} seconds {$milliseconds} milliseconds");
+            return;
+        }
+
+        $this->info("Elapsed Time: {$milliseconds} milliseconds");
     }
 }
