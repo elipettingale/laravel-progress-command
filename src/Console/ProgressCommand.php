@@ -11,7 +11,6 @@ abstract class ProgressCommand extends Command
     private $progressBars;
 
     abstract protected function getItems();
-    abstract protected function getItemIdentifier($item): string;
     abstract protected function fireItem($item): string;
     abstract protected function getProgressBarBlueprints(): array;
 
@@ -58,12 +57,20 @@ abstract class ProgressCommand extends Command
 
     private function renderInfoBar($item)
     {
-        $this->info('Current Item: ' . $this->getItemIdentifier($item));
+        if ($this->hasInfoBar()) {
+            $this->info('Current Item: ' . $this->getItemIdentifier($item));
+        }
     }
 
     private function moveCursorToTop()
     {
-        $this->moveCursorUp(\count($this->progressBars) + 1);
+        $count = \count($this->progressBars);
+
+        if ($this->hasInfoBar()) {
+            $count++;
+        }
+
+        $this->moveCursorUp($count);
     }
 
     private function moveCursorUp(int $lines = 1)
@@ -78,5 +85,10 @@ abstract class ProgressCommand extends Command
         for ($i = 0; $i < $lines; ++$i) {
             print "\n";
         }
+    }
+
+    private function hasInfoBar(): bool
+    {
+        return method_exists($this, 'getItemIdentifier');
     }
 }
