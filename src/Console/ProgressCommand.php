@@ -91,34 +91,8 @@ abstract class ProgressCommand extends Command
 
     private function renderElapsedTimeFormat($start_time, $end_time)
     {
-        $hours = (int)
-            ($minutes = (int)
-                ($seconds = (int)
-                    ($milliseconds = (int)
-                    (($end_time - $start_time) * 1000))
-                    / 1000)
-                / 60)
-            / 60;
+        $microtime = convert_microtime($end_time - $start_time);
 
-        $minutes = $minutes % 60;
-        $seconds = $seconds % 60;
-        $milliseconds = $milliseconds % 1000;
-
-        if ($hours !== 0) {
-            $this->info("Elapsed Time: {$hours} hours {$minutes} minutes {$seconds} seconds {$milliseconds} milliseconds");
-            return;
-        }
-
-        if ($minutes !== 0) {
-            $this->info("Elapsed Time: {$minutes} minutes {$seconds} seconds {$milliseconds} milliseconds");
-            return;
-        }
-
-        if ($seconds !== 0) {
-            $this->info("Elapsed Time: {$seconds} seconds {$milliseconds} milliseconds");
-            return;
-        }
-
-        $this->info("Elapsed Time: {$milliseconds} milliseconds");
+        $this->info($microtime->toString());
     }
 }
