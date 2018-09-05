@@ -2,6 +2,7 @@
 
 namespace EliPett\ProgressCommand\Console;
 
+use EliPett\ProgressCommand\Enums\ElapsedTimeFormats;
 use Illuminate\Console\Command;
 use EliPett\ProgressCommand\Services\ProgressBarFactory;
 
@@ -101,8 +102,12 @@ abstract class ProgressCommand extends Command
     {
         $time_diff =  $end_time - $start_time;
 
-        if ($this->elapsedTimeFormat === 'miliseconds') {
+        if ($this->elapsedTimeFormat === ElapsedTimeFormats::MILLISECONDS) {
             $this->info('Elapsed Time: ' . $time_diff * 1000);
+        }
+
+        if ($this->elapsedTimeFormat === ElapsedTimeFormats::SECONDS) {
+            $this->info('Elapsed Time: ' . date('s', $time_diff));
         }
     }
 }
