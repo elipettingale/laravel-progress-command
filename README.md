@@ -39,3 +39,6 @@ Will output various progress bars which will be updated depending on the key ret
         }
     }
 
+### ProgressBarBlueprint
+
+These are how you define the progress bars that get printed to the console. Each blueprint must have a 'key', which is used to identify which progress bar to increment by the fireItem method, and a 'description' which is free text that is used as a label for the progress bar.
